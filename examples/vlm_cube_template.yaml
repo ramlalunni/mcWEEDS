@@ -1,0 +1,88 @@
+# mcWEEDS template: spectra taken from GILDAS VLM cubes  (no data included: edit the file names)
+#
+# A VLM cube is a GILDAS data cube stored with the velocity/frequency axis first (V-L-M), so that
+# CLASS can open it directly with FILE IN: every pixel of the cube is then one spectrum. It is made
+# from an LMV cube (e.g. imported from a FITS cube with GILDAS) by transposing the axes. mcWEEDS
+# reads VLM cubes and CLASS spectra files (.30m, .cla, ...) in exactly the same way, so they can be
+# mixed in one fit, and everything else in the config is as in examples/so_2comp_multi_spectrum.yaml.
+#
+# WHICH PIXEL IS USED: `select: offset`
+# -------------------------------------
+# Each pixel spectrum carries its offset (dx, dy) in arcsec from the projection centre of the cube
+# (the reference position in the cube header, usually the phase/map centre; dx positive to the east).
+# mcWEEDS takes the spectrum whose offset matches `select: offset` within `select: match`:
+#
+#   select: {offset: [0, 0]}          the pixel at the projection centre (the default)
+#   select: {offset: [0.8, -0.4]}     the pixel 0.8" east and 0.4" south of it
+#
+# * The offset must be that of an actual pixel, i.e. a multiple of the pixel size from the centre
+#   pixel. To list the offsets in CLASS:   file in mycube.vlm   find   list
+# * `match` is the tolerance [arcsec] (default 0.2). Keep it smaller than half the pixel size, so
+#   that exactly one pixel matches; e.g. for 0.2" pixels use match: 0.05.
+# * mcWEEDS prints how many spectra matched: if several match, the first is used (with a
+#   warning); if none matches, the run stops and says so.
+# * If the source is not at the projection centre, give the offset of the pixel at the source
+#   position (offset of source = its coordinates minus those of the projection centre). Small
+#   cut-outs (e.g. 3 x 3 pixels around the source, centred on it) keep files small and make
+#   [0, 0] the source pixel.
+# * The same selection is used for the data and for every model, so the model is always
+#   computed on the frequency axis of that pixel.
+#
+# Run from the mcWEEDS folder:   python run_mcweeds.py my_vlm_config.yaml
+# Look at the data first:        python tools/plot_observed_lines.py my_vlm_config.yaml
+
+run_name: my_vlm_fit
+telescope_size: 12.0               # [m]; WEEDS computes the beam size from this diameter. For interferometer
+                                   # cubes use the diameter of an equivalent dish that gives the restoring beam
+catalog: data/cdms_210_265_GHz.db
+
+chi_sq_method: whitened
+
+select:                            # default for all spectra below (each can override it)
+  offset: [0, 0]                   # [arcsec] pixel of the cube: here the projection centre
+  match: 0.1                       # [arcsec] < half the pixel size
+
+mcmc:
+  n_walkers: 32
+  n_steps: 3000
+  n_threads: 16
+
+spectra:
+  - file: data/my_line1.vlm        # one cube per line (cut-outs) ...
+    label: 'line 1'
+    rest_freq: 219949.442          # [MHz] for the velocity windows and the velocity axis of the plot
+    line_windows_kms:  [[-6.0, 30.0]]
+    noise_windows_kms: [[-45.0, -15.0], [40.0, 65.0]]
+
+  - file: data/my_line2.vlm
+    label: 'line 2, another pixel'
+    rest_freq: 251825.770
+    line_windows_kms:  [[-6.0, 30.0]]
+    noise_windows_kms: [[-45.0, -15.0], [40.0, 65.0]]
+    select: {offset: [0.4, 0.0]}   # this cube: the pixel 0.4" east of its projection centre
+
+  - file: data/my_spectrum.30m     # ... and CLASS spectra files can be mixed in
+    label: 'line 3'
+    rest_freq: 258255.826
+    line_windows_kms:  [[-6.0, 30.0]]
+    noise_windows_kms: [[-45.0, -15.0], [40.0, 65.0]]
+    select: {offset: any, number: 1}   # CLASS file: observation number 1, whatever its offset
+
+# One spectrum containing several lines works the same way:
+#   spectrum_file: data/my_band.vlm
+#   select: {offset: [0, 0]}
+#   line_windows: [[...], [...]]       # MHz
+#   noise_windows: [[...], [...]]
+
+molecules:
+  - name: SO
+    species: 'SO, v=0'             # CDMS entry name
+    label: 'SO'
+    ntot:  [1.0e15, 1.0e19]
+    tex:   [20.0, 300.0]
+    source_size: {fixed: 1.0}
+    v_off: [5.0, 20.0]
+    width: [1.0, 10.0]
+
+plot:
+  v_sys: 12.0

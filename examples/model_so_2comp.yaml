@@ -1,0 +1,5 @@
+# One WEEDS model: start of the walkers (mcmc: init_model) or input of tools/single_model.py.
+# Key = component name in the config; all five parameters (ntot in cm^-2, linear; source_size in arcsec;
+# v_off and width in km/s). Deliberately not the true values (examples/truth_so_2comp.yaml).
+SO_c: {ntot: 5.0e15, tex: 100.0, source_size: 0.5, v_off: 12.5, width: 3.5}
+SO_e: {ntot: 3.0e14, tex: 40.0,  source_size: 4.0, v_off: 10.0, width: 7.0}

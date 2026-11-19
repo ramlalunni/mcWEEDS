@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "mcWEEDS: MCMC fitting of molecular line spectra under LTE with GILDAS/CLASS WEEDS"
+type: software
+authors:
+  - family-names: "Unnikrishnan"
+    given-names: "Ramlal"
+    affiliation: "Centro de Astrobiología (CAB), CSIC-INTA"
+    email: "ramlalunni@gmail.com"
+    orcid: "https://orcid.org/0000-0002-2843-2476"
+version: "1.0.0"
+date-released: "2026-11-20"
+license: GPL-3.0-only
+repository-code: "https://github.com/ramlalunni/mcWEEDS"
+abstract: >-
+  MCMC fitting of molecular line spectra under LTE, using the WEEDS extension
+  of GILDAS/CLASS as the radiative-transfer model and emcee as the sampler.
+  Fits one or several spectra (CLASS files or VLM cubes) at once.
+keywords:
+  - astronomy
+  - radio astronomy
+  - spectroscopy
+  - radiative transfer
+  - MCMC
+  - GILDAS

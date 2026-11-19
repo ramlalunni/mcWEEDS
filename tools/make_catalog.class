@@ -1,0 +1,10 @@
+! Make a local copy of the CDMS catalogue for WEEDS (run once: class -nw @tools/make_catalog.class).
+! The range below (210-265 GHz) covers the examples. For your data, edit the output name and the
+! frequency range [MHz] so that it covers all your spectra, and set  catalog: <that file>  in the config.
+! For JPL use "use in jpl" (JPL species names have no ", v=0", e.g. SO instead of 'SO, v=0').
+! CDMS species names contain spaces/commas (e.g. 'SO, v=0'); mcWEEDS quotes them for WEEDS.
+use in cdms
+use out data/cdms_210_265_GHz.db
+select /freq 210000 265000
+insert
+exit

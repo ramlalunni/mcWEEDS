@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+# run outputs
+MCMC_*/
+SINGLE_*/
+synth_work_*/
+fort.51
+# data/: only the example spectra, their noise-free models and noise, and the example
+# catalogue are part of the repository;
+# your own spectra and the local catalogue copies stay local
+data/*
+!data/synth_*.30m
+!data/truth_*_spectra.npz
+!data/cdms_examples.db
+# scratch
+tests/
+test*/

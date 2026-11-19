@@ -1,0 +1,3 @@
+# True parameters of the synthetic spectrum data/synth_h2co_hc3n_218GHz.30m (fictitious source)
+H2CO: {ntot: 5.0e14, tex: 75.0, source_size: 1.5, v_off: 12.0, width: 4.0}
+HC3N: {ntot: 2.0e13, tex: 75.0, source_size: 1.5, v_off: 12.0, width: 3.5}

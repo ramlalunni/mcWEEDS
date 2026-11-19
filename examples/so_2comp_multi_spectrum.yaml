@@ -1,0 +1,102 @@
+# mcWEEDS example 2: SEVERAL spectra (one file per line), two components of the same species
+# Synthetic data (fictitious source, ALMA Bands 6/7): five SO lines, each in its own spectrum, from a compact
+# warm component and an extended cooler one, computed with WEEDS for the parameters in
+# examples/truth_so_2comp.yaml plus correlated noise (rms 50 mK, neighbouring-channel correlation 0.39).
+# The same WEEDS model (same parameters) is evaluated on every spectrum; the chi-square values are summed.
+# The files could equally be VLM cubes, or a mix (see examples/vlm_cube_template.yaml).
+#
+# Fit:          python run_mcweeds.py examples/so_2comp_multi_spectrum.yaml
+# One model:    python tools/single_model.py examples/so_2comp_multi_spectrum.yaml examples/model_so_2comp.yaml
+# Remake data:  python tools/make_synthetic_spectra.py examples/so_2comp_multi_spectrum.yaml \
+#                      examples/truth_so_2comp.yaml --rms 0.05 --seed 2
+
+run_name: example_so_2comp
+telescope_size: 300.0              # [m] beam ~1.1" at 218 GHz, scaling as 1/frequency
+catalog: data/cdms_examples.db     # CDMS subset with the example species (included); for your data: a local
+                                   # CDMS copy (tools/make_catalog.class)
+# CDMS species names often contain spaces or commas ('SO, v=0' below): quote them in YAML;
+# mcWEEDS quotes them for WEEDS. A JPL copy works the same way (with JPL names, e.g. SO).
+
+chi_sq_method: whitened
+noise_acf: [1.0, 0.39]             # optional fixed noise ACF (here: the value used to make the data);
+                                   # remove it to estimate the ACF from the noise windows
+noise_rms: 0.05                    # optional fixed RMS noise [K] for all spectra (here: the value used to make
+                                   # the data). Without it, the RMS of each spectrum is measured in its noise
+                                   # windows -- with few noise channels per cut-out that estimate is
+                                   # uncertain by ~20 %. Can also be set per spectrum (noise_rms: under it).
+
+# select: {offset: [0, 0], match: 0.2}   # default selection for all spectra (each spectrum can override it)
+
+mcmc:
+  n_walkers: 32                    # 8 free parameters -> at least 16 walkers
+  n_steps: 2000
+  n_threads: 16
+  init_model: examples/model_so_2comp.yaml   # walkers start in a small ball around this model
+                                             # (deliberately not the true values)
+  init_scatter: 0.05
+
+# ---------------------------------------------------------------- spectra
+# Windows in km/s relative to rest_freq (radio convention), or in MHz with line_windows / noise_windows.
+# Optional per spectrum: label, telescope_size, plot_range [MHz], select, noise_rms.
+# grid: [fmin, fmax, channel width] MHz is only used to make the synthetic data.
+spectra:
+  - file: data/synth_so_215221.30m
+    label: 'SO $5_5$-$4_4$ (44 K)'
+    rest_freq: 215220.653
+    grid: [215170.400, 215256.548, 0.488]
+    line_windows_kms:  [[-6.0, 30.0]]
+    noise_windows_kms: [[-45.0, -15.0], [40.0, 65.0]]
+
+  - file: data/synth_so_219949.30m
+    label: 'SO $5_6$-$4_5$ (35 K)'
+    rest_freq: 219949.442
+    grid: [219898.085, 219986.126, 0.488]
+    line_windows_kms:  [[-6.0, 30.0]]
+    noise_windows_kms: [[-45.0, -15.0], [40.0, 65.0]]
+
+  - file: data/synth_so_251826.30m
+    label: 'SO $6_5$-$5_4$ (51 K)'
+    rest_freq: 251825.770
+    grid: [251766.970, 251867.770, 0.488]
+    line_windows_kms:  [[-6.0, 30.0]]
+    noise_windows_kms: [[-45.0, -15.0], [40.0, 65.0]]
+
+  - file: data/synth_so_258256.30m
+    label: 'SO $6_6$-$5_5$ (56 K)'
+    rest_freq: 258255.826
+    grid: [258195.525, 258298.898, 0.488]
+    line_windows_kms:  [[-6.0, 30.0]]
+    noise_windows_kms: [[-45.0, -15.0], [40.0, 65.0]]
+
+  - file: data/synth_so_261844.30m
+    label: 'SO $6_7$-$5_6$ (48 K)'
+    rest_freq: 261843.721
+    grid: [261782.582, 261887.392, 0.488]
+    line_windows_kms:  [[-6.0, 30.0]]
+    noise_windows_kms: [[-45.0, -15.0], [40.0, 65.0]]
+
+# ---------------------------------------------------------------- components
+# `species` = catalogue entry (both components are SO); `name` must be unique. The five lines span
+# E_u/k = 35-56 K, so they constrain T_ex well only up to ~100 K.
+# WEEDS adds the two components (no absorption of one by the other).
+molecules:
+  - name: SO_c
+    species: 'SO, v=0'
+    label: 'SO compact'
+    ntot:  [1.0e14, 1.0e18]
+    tex:   [50.0, 400.0]
+    source_size: {fixed: 0.5}
+    v_off: [8.0, 16.0]
+    width: [1.0, 6.0]
+
+  - name: SO_e
+    species: 'SO, v=0'
+    label: 'SO extended'
+    ntot:  [1.0e13, 1.0e17]
+    tex:   [10.0, 100.0]
+    source_size: {fixed: 4.0}
+    v_off: [6.0, 15.0]
+    width: [4.0, 15.0]
+
+plot:
+  v_sys: 12.0

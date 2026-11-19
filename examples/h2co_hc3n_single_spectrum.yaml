@@ -1,0 +1,87 @@
+# mcWEEDS example 1: ONE spectrum containing several lines of two molecules
+# Synthetic data (fictitious source, ALMA Band 6): H2CO (three lines, a classic temperature probe)
+# and HC3N 24-23 in one 800 MHz wide spectrum, computed with WEEDS for the parameters in
+# examples/truth_h2co_hc3n.yaml plus correlated noise (rms 50 mK, neighbouring-channel correlation 0.39).
+# A good fit recovers those values.
+#
+# Fit:          python run_mcweeds.py examples/h2co_hc3n_single_spectrum.yaml
+# Remake data:  python tools/make_synthetic_spectra.py examples/h2co_hc3n_single_spectrum.yaml \
+#                      examples/truth_h2co_hc3n.yaml --rms 0.05 --seed 1
+
+# ---------------------------------------------------------------- input / output
+spectrum_file: data/synth_h2co_hc3n_218GHz.30m   # any file CLASS opens: CLASS spectra file or VLM cube
+spectrum_label: 'H$_2$CO + HC$_3$N, 218.1-218.9 GHz'
+grid: [218100.0, 218900.0, 0.488]  # [fmin, fmax, channel width] MHz: only used to make the synthetic data
+# rest_freq: 218222.192            # MHz, optional: with it, plots use a velocity axis relative to
+                                   # this line; without it (better for a wide band) a frequency axis
+# select:                          # which spectrum of the file (default: offset [0, 0], first match)
+#   offset: [0, 0]                 # [x, y] arcsec, or "any"; for a VLM cube: the pixel (see examples/vlm_cube_template.yaml)
+#   match: 0.2                     # offset tolerance [arcsec]
+#   number: 12                     # observation number (CLASS files with several spectra)
+#   source: SYNTH                  # also: line, telescope (names as in the CLASS header)
+run_name: example_h2co_hc3n        # results go to MCMC_<run_name>/ unless output_dir is set
+telescope_size: 300.0              # [m] WEEDS computes the beam from this diameter: ~1.1" at 218 GHz
+                                   # (for interferometer data: an equivalent dish giving the restoring beam)
+catalog: data/cdms_examples.db     # CDMS subset with the example species (included); for your data: a local
+                                   # CDMS copy (tools/make_catalog.class), or "cdms" (online, slow)
+
+# ---------------------------------------------------------------- likelihood
+chi_sq_method: whitened            # whitened | standard | integrated
+# noise_rms: 0.05                  # optional: fixed RMS [K] instead of the estimate from noise_windows
+# noise_acf: [1.0, 0.39]           # optional: fixed noise ACF instead of the estimate from noise_windows
+
+# ---------------------------------------------------------------- MCMC
+mcmc:
+  n_walkers: 24                    # >= 2 x number of free parameters (here 6)
+  n_steps: 2000
+  n_threads: 12                    # parallel CLASS processes
+  # init_model: my_model.yaml      # optional: start walkers around a model (format: examples/truth_*.yaml)
+  # init_scatter: 0.05             # half-width of the start ball, fraction of each prior range
+
+# ---------------------------------------------------------------- molecules / components (1 to 3)
+# Parameters: ntot [cm^-2], tex [K], source_size [arcsec], v_off [km/s], width [km/s, FWHM].
+# Each one is:
+#   [min, max]                 free, uniform prior (ntot is fitted as log10)
+#   value  or  {fixed: value}  held fixed
+#   {shared_with: NAME}        tied to the same parameter of another component
+molecules:
+  - name: H2CO                     # unique name; also the catalogue entry unless `species:` is given
+    label: 'H$_2$CO'               # used in plots
+    ntot:  [1.0e13, 1.0e17]
+    tex:   [20.0, 300.0]
+    source_size: {fixed: 1.5}      # or e.g. [0.2, 5.0] to fit it (degenerate with ntot if thin and unresolved)
+    v_off: [5.0, 20.0]
+    width: [1.0, 10.0]
+
+  - name: HC3N                     # one line only: its T_ex and velocity are taken from H2CO
+    species: 'HC3N, v=0'           # CDMS entry name (quoted: it contains a comma and a space)
+    label: 'HC$_3$N'
+    ntot:  [1.0e12, 1.0e16]
+    tex:   {shared_with: H2CO}
+    source_size: {fixed: 1.5}
+    v_off: {shared_with: H2CO}
+    width: [1.0, 10.0]
+
+# ---------------------------------------------------------------- windows [MHz]
+line_windows:                      # channels used in the fit (lines at v = +12 km/s)
+  - [218206.5, 218220.5]
+  - [218309.0, 218323.0]
+  - [218459.9, 218473.9]
+  - [218744.3, 218758.3]
+
+noise_windows:                     # line-free channels for the RMS and the noise correlation
+  - [218110.0, 218195.0]
+  - [218235.0, 218295.0]
+  - [218340.0, 218445.0]
+  - [218490.0, 218730.0]
+  - [218775.0, 218890.0]
+
+# ---------------------------------------------------------------- plot
+plot:
+  v_sys: 12.0                      # km/s, shifts the transition markers
+
+transitions:                       # [rest frequency MHz, label], annotation only
+  - [218222.192, 'H$_2$CO $3_{0,3}$-$2_{0,2}$ (21 K)']
+  - [218324.723, 'HC$_3$N 24-23 (131 K)']
+  - [218475.632, 'H$_2$CO $3_{2,2}$-$2_{2,1}$ (68 K)']
+  - [218760.066, 'H$_2$CO $3_{2,1}$-$2_{2,0}$ (68 K)']
