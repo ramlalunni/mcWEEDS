@@ -1,5 +1,7 @@
 # mcWEEDS
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24400869.svg)](https://doi.org/10.5281/zenodo.24400869)
+
 MCMC fitting of molecular line spectra under LTE, using the
 [WEEDS](https://www.iram.fr/IRAMFR/GILDAS/) extension of GILDAS/CLASS as the
 radiative-transfer model and [emcee](https://emcee.readthedocs.io) as the sampler.
@@ -401,8 +403,11 @@ docs/images/            example output figures shown in this README
 
 ## Citation
 
-If you use mcWEEDS, please cite this repository (GitHub's "Cite this repository" button)
-and the software and data it relies on: GILDAS
+If you use mcWEEDS, please cite its Zenodo record,
+[doi:10.5281/zenodo.24400869](https://doi.org/10.5281/zenodo.24400869) (all versions; the DOI of each
+version, e.g. [10.5281/zenodo.24400870](https://doi.org/10.5281/zenodo.24400870) for v1.0.0, is listed on the
+record), also available from GitHub's "Cite this repository" button, and the software
+and data it relies on: GILDAS
 ([Gildas Team 2013](https://scixplorer.org/abs/2013ascl.soft05010G/abstract)), WEEDS
 ([Maret et al. 2011](https://scixplorer.org/abs/2011A%26A...526A..47M/abstract)), emcee
 ([Foreman-Mackey et al. 2013](https://scixplorer.org/abs/2013PASP..125..306F/abstract)), corner.py

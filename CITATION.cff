@@ -10,6 +10,14 @@ authors:
     orcid: "https://orcid.org/0000-0002-2843-2476"
 version: "1.0.0"
 date-released: "2026-11-20"
+doi: "10.5281/zenodo.24400869"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.24400869"
+    description: "Concept DOI: all versions of mcWEEDS (resolves to the latest)"
+  - type: doi
+    value: "10.5281/zenodo.24400870"
+    description: "Version 1.0.0"
 license: GPL-3.0-only
 repository-code: "https://github.com/ramlalunni/mcWEEDS"
 abstract: >-
