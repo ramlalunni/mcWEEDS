@@ -419,5 +419,6 @@ catalogue you use: CDMS
 
 ## Licence
 
-mcWEEDS is free software, distributed under the GNU General Public License v3.0;
-see [`LICENSE`](LICENSE).
+mcWEEDS is free and open-source software, distributed under the GNU General Public
+License v3.0 (GPL-3.0); see [`LICENSE`](LICENSE). It is provided "as is", without
+warranty of any kind.
